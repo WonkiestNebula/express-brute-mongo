@@ -1,5 +1,5 @@
-const AbstractClientStore = require("express-brute/lib/AbstractClientStore");
-const moment = require("moment");
+const AbstractClientStore = require('express-brute/lib/AbstractClientStore');
+const moment = require('moment');
 
 class MongoStore extends AbstractClientStore {
   constructor(getCollection, options) {
@@ -14,7 +14,7 @@ class MongoStore extends AbstractClientStore {
   async set(key, value, lifetime, callback) {
     let _id = this.options.prefix + key;
     let expiration = lifetime
-      ? moment().add(lifetime, "seconds").toDate()
+      ? moment().add(lifetime, 'seconds').toDate()
       : undefined;
     await this._collection.updateOne(
       {
@@ -32,7 +32,7 @@ class MongoStore extends AbstractClientStore {
       }
     );
 
-    typeof callback == "function" && callback(null, value);
+    typeof callback == 'function' && callback(null, value);
   }
 
   async get(key, callback) {
@@ -51,9 +51,9 @@ class MongoStore extends AbstractClientStore {
         data.lastRequest = new Date(data.lastRequest);
         data.firstRequest = new Date(data.firstRequest);
       }
-      typeof callback == "function" && callback(null, data);
+      typeof callback == 'function' && callback(null, data);
     } catch (err) {
-      typeof callback == "function" && callback(err);
+      typeof callback == 'function' && callback(err);
     }
   }
 
@@ -61,12 +61,12 @@ class MongoStore extends AbstractClientStore {
     let _id = this.options.prefix + key;
     await this._collection.deleteOne({ _id: _id });
 
-    typeof callback == "function" && callback(null, arguments);
+    typeof callback == 'function' && callback(null, arguments);
   }
 }
 
 MongoStore.defaults = {
-  prefix: "",
+  prefix: '',
 };
 
 module.exports = MongoStore;
