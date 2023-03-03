@@ -1,58 +1,56 @@
-var expect = require('expect.js');
+let expect = require('expect.js');
 
-var MongoStore = require('../');
-var getDb = require('mongo-getdb');
-getDb.init('default', 'mongodb://localhost/test_brute_express_mongo');
+let MongoStore = require('../');
+const MongoClient = require('mongodb').MongoClient;
 
-var mongoStore, collection;
+let mongoStore, collection;
+
+const clientPromise = MongoClient.connect('mongodb://127.0.0.1:27017');
 
 describe('MongoStore', function () {
-  beforeEach(function (done) {
-    mongoStore = new MongoStore(function (callback) {
-      getDb(function (db) {
+  beforeEach(async () => {
+    return new Promise((resolve) => {
+      mongoStore = new MongoStore(async (callback) => {
+        const client = await clientPromise;
+        const db = client.db('test_brute_express_mongo');
         collection = db.collection('api_limits');
-        collection.remove({}, function () {
-          callback(collection);
-          done();
-        });
+        await collection.deleteMany({});
+        callback(collection);
+        resolve();
       });
     });
   });
 
-  it('should be able to set a value', function (done) {
-    mongoStore.set('foo', {bar:123}, 1000, function (err) {
-      if (err) return done(err);
-      collection.findOne({_id: 'foo'}, function (err, limit) {
-        if (err) return done(err);
-        expect(limit.data).have.property('bar');
-        expect(limit.expires).to.be.a(Date);
-        done();
-      });
-    });
+  it('should be able to set a value', (done) => {
+    (async () => {
+      await mongoStore.set('foo', { bar: 123 }, 1000);
+      let limit = await collection.findOne({ _id: 'foo' });
+      expect(limit.data).have.property('bar');
+      expect(limit.expires).to.be.a(Date);
+      done();
+    })();
   });
 
-  it('should be able to get a value', function (done) {
-    mongoStore.set('foo', {bar:123}, 1000, function (err) {
-      if (err) return done(err);
+  it('should be able to get a value', (done) => {
+    (async () => {
+      await mongoStore.set('foo', { bar: 123 }, 1000);
       mongoStore.get('foo', function (err, data) {
         if (err) return done(err);
         expect(data).have.property('bar');
         done();
       });
-    });
+    })();
   });
 
   it('should return undef if expired', function (done) {
     mongoStore.set('foo', { bar: 123 }, 0, function (err) {
       if (err) return done(err);
       setTimeout(function () {
-
         mongoStore.get('foo', function (err, data) {
           if (err) return done(err);
           expect(data).to.be(undefined);
           done();
         });
-
       }, 200);
     });
   });
@@ -62,35 +60,26 @@ describe('MongoStore', function () {
       if (err) return done(err);
       setTimeout(function () {
         mongoStore.get('foo', function (err, data) {
-
-          setTimeout(function () {
-
-            collection.findOne({ _id: 'foo' }, function (err, d) {
-              expect(d).to.be(null);
-              done();
-            });
-
+          setTimeout(async function () {
+            let d = await collection.findOne({ _id: 'foo' });
+            expect(d).to.be(null);
+            done();
           }, 100);
-
         });
       }, 100);
     });
   });
 
-
   it('should be able to reset', function (done) {
-    mongoStore.set('foo', {bar:123}, 1000, function (err) {
+    mongoStore.set('foo', { bar: 123 }, 1000, function (err) {
       if (err) return done(err);
-      mongoStore.reset('foo', function (err) {
+      mongoStore.reset('foo', async function (err) {
         if (err) return done(err);
 
-        collection.findOne({_id: 'foo'}, function (err, limit) {
-          if (err) return done(err);
-          expect(limit).to.be(null);
-          done();
-        });
+        let limit = await collection.findOne({ _id: 'foo' });
+        expect(limit).to.be(null);
+        done();
       });
     });
   });
-
 });
