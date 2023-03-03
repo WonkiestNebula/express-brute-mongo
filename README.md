@@ -1,4 +1,5 @@
 MongoDB store adapter for the [express-brute](https://github.com/AdamPflug/express-brute).
+Updated from [express-brute-mongo](https://github.com/auth0/express-brute-mongo) for newer mongodb drivers.
 
 ## Installation
 
@@ -37,10 +38,6 @@ Create an index with `expireAfterSeconds: 0` in mongo as follows:
 ```
 db.my_api_limits_coll.ensureIndex({expires: 1}, {expireAfterSeconds: 0});
 ```
-
-## Issue Reporting
-
-If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://auth0.com/whitehat) details the procedure for disclosing security issues.
 
 ## Author
 
