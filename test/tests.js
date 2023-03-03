@@ -8,41 +8,37 @@ let mongoStore, collection;
 const clientPromise = MongoClient.connect('mongodb://127.0.0.1:27017');
 
 describe('MongoStore', function () {
-  beforeEach(async () => {
-    return new Promise((resolve) => {
-      mongoStore = new MongoStore(async (callback) => {
-        const client = await clientPromise;
-        const db = client.db('test_brute_express_mongo');
-        collection = db.collection('api_limits');
-        await collection.deleteMany({});
-        callback(collection);
-        resolve();
-      });
+  beforeEach((done) => {
+    mongoStore = new MongoStore(async (callback) => {
+      const client = await clientPromise;
+      const db = client.db('test_brute_express_mongo');
+      collection = db.collection('api_limits');
+      await collection.deleteMany({});
+      callback(collection);
+      done();
     });
   });
 
   it('should be able to set a value', (done) => {
-    (async () => {
-      await mongoStore.set('foo', { bar: 123 }, 1000);
+    mongoStore.set('foo', { bar: 123 }, 1000, async (err) => {
       let limit = await collection.findOne({ _id: 'foo' });
       expect(limit.data).have.property('bar');
       expect(limit.expires).to.be.a(Date);
       done();
-    })();
+    });
   });
 
   it('should be able to get a value', (done) => {
-    (async () => {
-      await mongoStore.set('foo', { bar: 123 }, 1000);
+    mongoStore.set('foo', { bar: 123 }, 1000, function (err) {
       mongoStore.get('foo', function (err, data) {
         if (err) return done(err);
         expect(data).have.property('bar');
         done();
       });
-    })();
+    });
   });
 
-  it('should return undef if expired', function (done) {
+  it('should return undef if expired', (done) => {
     mongoStore.set('foo', { bar: 123 }, 0, function (err) {
       if (err) return done(err);
       setTimeout(function () {

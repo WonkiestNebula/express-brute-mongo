@@ -10,8 +10,11 @@
     "type": "git",
     "url": "https://github.com/auth0/express-brute-mongo.git"
   },
-  "author": "José F. Romaniello <jfromaniello@gmail.com> (http://joseoncode.com)",
-  "license": "BSD",
+  "authors": [
+    "José F. Romaniello <jfromaniello@gmail.com> (http://joseoncode.com)",
+    "Josh Ryals <joshryals@gmail.com>"
+  ],
+  "license": "MIT",
   "devDependencies": {
     "expect.js": "~0.3.1",
     "express": "~4.14.0",

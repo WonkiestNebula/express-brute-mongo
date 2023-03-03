@@ -12,27 +12,31 @@ class MongoStore extends AbstractClientStore {
   }
 
   async set(key, value, lifetime, callback) {
-    let _id = this.options.prefix + key;
-    let expiration = lifetime
-      ? moment().add(lifetime, 'seconds').toDate()
-      : undefined;
-    await this._collection.updateOne(
-      {
-        _id: _id,
-      },
-      {
-        $set: {
+    try {
+      let _id = this.options.prefix + key;
+      let expiration = lifetime
+        ? moment().add(lifetime, 'seconds').toDate()
+        : undefined;
+      await this._collection.updateOne(
+        {
           _id: _id,
-          data: value,
-          expires: expiration,
         },
-      },
-      {
-        upsert: true,
-      }
-    );
+        {
+          $set: {
+            _id: _id,
+            data: value,
+            expires: expiration,
+          },
+        },
+        {
+          upsert: true,
+        }
+      );
 
-    typeof callback == 'function' && callback(null, value);
+      typeof callback == 'function' && callback(null, value);
+    } catch (err) {
+      typeof callback == 'function' && callback(err);
+    }
   }
 
   async get(key, callback) {
@@ -58,10 +62,13 @@ class MongoStore extends AbstractClientStore {
   }
 
   async reset(key, callback) {
-    let _id = this.options.prefix + key;
-    await this._collection.deleteOne({ _id: _id });
-
-    typeof callback == 'function' && callback(null, arguments);
+    try {
+      let _id = this.options.prefix + key;
+      await this._collection.deleteOne({ _id: _id });
+      typeof callback == 'function' && callback(null, arguments);
+    } catch (err) {
+      typeof callback == 'function' && callback(err);
+    }
   }
 }
 
