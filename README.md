@@ -4,14 +4,14 @@ Updated from [express-brute-mongo](https://github.com/auth0/express-brute-mongo)
 ## Installation
 
 ```
-npm install express-brute-mongo
+npm install express-brute-mongo-update
 ```
 
 ## Usage
 
 ```javascript
 var ExpressBrute = require('express-brute'),
-var MongoStore = require('express-brute-mongo');
+var MongoStore = require('express-brute-mongo-update');
 var MongoClient = require('mongodb').MongoClient;
 
 var store = new MongoStore(function (ready) {
