@@ -1,4 +1,4 @@
-MongoDB store adapter for the [express-brute](https://github.com/AdamPflug/express-brute).
+MongoDB store adapter for the [express-brute](https://github.com/AdamPflug/express-brute).  
 Updated from [express-brute-mongo](https://github.com/auth0/express-brute-mongo) for newer mongodb drivers.
 
 ## Installation
